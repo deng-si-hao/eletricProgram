@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysPictureMapper">
+    
+    <resultMap type="SysPicture" id="SysPictureResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="pictureFolderId"    column="picture_folder_id"    />
+        <result property="picturePath"    column="picture_path"    />
+        <result property="time"    column="time"    />
+        <result property="additionalInfo"    column="additional_info"    />
+        <result property="assetId"    column="asset_id"    />
+        <result property="unit"    column="unit"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysPictureVo">
+        select id, name, picture_folder_id, picture_path, time, additional_info, asset_id, unit, create_by, create_time, update_by, update_time from sys_picture
+    </sql>
+
+    <select id="selectSysPictureList" parameterType="SysPicture" resultMap="SysPictureResult">
+        <include refid="selectSysPictureVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="pictureFolderId != null "> and picture_folder_id = #{pictureFolderId}</if>
+            <if test="picturePath != null  and picturePath != ''"> and picture_path = #{picturePath}</if>
+            <if test="time != null "> and time = #{time}</if>
+            <if test="additionalInfo != null  and additionalInfo != ''"> and additional_info = #{additionalInfo}</if>
+            <if test="assetId != null "> and asset_id = #{assetId}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysPictureById" parameterType="Long" resultMap="SysPictureResult">
+        <include refid="selectSysPictureVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysPicture" parameterType="SysPicture">
+        insert into sys_picture
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="pictureFolderId != null">picture_folder_id,</if>
+            <if test="picturePath != null and picturePath != ''">picture_path,</if>
+            <if test="time != null">time,</if>
+            <if test="additionalInfo != null">additional_info,</if>
+            <if test="assetId != null">asset_id,</if>
+            <if test="unit != null">unit,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="pictureFolderId != null">#{pictureFolderId},</if>
+            <if test="picturePath != null and picturePath != ''">#{picturePath},</if>
+            <if test="time != null">#{time},</if>
+            <if test="additionalInfo != null">#{additionalInfo},</if>
+            <if test="assetId != null">#{assetId},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysPicture" parameterType="SysPicture">
+        update sys_picture
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="pictureFolderId != null">picture_folder_id = #{pictureFolderId},</if>
+            <if test="picturePath != null and picturePath != ''">picture_path = #{picturePath},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="additionalInfo != null">additional_info = #{additionalInfo},</if>
+            <if test="assetId != null">asset_id = #{assetId},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysPictureById" parameterType="Long">
+        delete from sys_picture where id = #{id}
+    </delete>
+
+    <delete id="deleteSysPictureByIds" parameterType="String">
+        delete from sys_picture where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

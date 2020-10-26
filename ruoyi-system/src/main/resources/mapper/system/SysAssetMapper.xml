@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysAssetMapper">
+    
+    <resultMap type="SysAsset" id="SysAssetResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="type"    column="type"    />
+        <result property="additionalInfo"    column="additional_info"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="unit"    column="unit"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysAssetVo">
+        select id, name, type, additional_info, tenant_id, unit, create_by, create_time, update_by, update_time from sys_asset
+    </sql>
+
+    <select id="selectSysAssetList" parameterType="SysAsset" resultMap="SysAssetResult">
+        <include refid="selectSysAssetVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="additionalInfo != null  and additionalInfo != ''"> and additional_info = #{additionalInfo}</if>
+            <if test="tenantId != null "> and tenant_id = #{tenantId}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysAssetById" parameterType="Long" resultMap="SysAssetResult">
+        <include refid="selectSysAssetVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysAsset" parameterType="SysAsset">
+        insert into sys_asset
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="additionalInfo != null">additional_info,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="unit != null">unit,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="additionalInfo != null">#{additionalInfo},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <insert id="addListMysql" parameterType="java.util.List">
+        INSERT INTO asset
+        (id, name, type, additional_info, tenant_id, unit, create_by, create_time)
+        VALUES
+        <foreach collection="list" item="data" separator="," index="index">
+            (#{data.id,jdbcType=NUMERIC},#{data.name,jdbcType=VARCHAR},
+            #{data.type,jdbcType=VARCHAR},#{data.additionalInfo,jdbcType=VARCHAR},
+            #{data.tenantId,jdbcType=NUMERIC},#{data.unit,jdbcType=NUMERIC},
+            #{data.createBy,jdbcType=NUMERIC},#{data.createTime,jdbcType=NUMERIC},)
+        </foreach>
+    </insert>
+
+    <update id="updateSysAsset" parameterType="SysAsset">
+        update sys_asset
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="additionalInfo != null">additional_info = #{additionalInfo},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysAssetById" parameterType="Long">
+        delete from sys_asset where id = #{id}
+    </delete>
+
+    <delete id="deleteSysAssetByIds" parameterType="String">
+        delete from sys_asset where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
