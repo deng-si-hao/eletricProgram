@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysFolderMapper">
+    
+    <resultMap type="SysFolder" id="SysFolderResult">
+        <result property="id"    column="id"    />
+        <result property="assetId"    column="asset_id"    />
+        <result property="name"    column="name"    />
+        <result property="additionalInfo"    column="additional_info"    />
+        <result property="tenantId"    column="tenant_id"    />
+        <result property="type"    column="type"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectSysFolderVo">
+        select id, asset_id, name, additional_info, tenant_id, type, create_by, create_time, update_by, update_time from sys_folder
+    </sql>
+
+    <select id="selectSysFolderList" parameterType="SysFolder" resultMap="SysFolderResult">
+        <include refid="selectSysFolderVo"/>
+        <where>  
+            <if test="assetId != null "> and asset_id = #{assetId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="additionalInfo != null  and additionalInfo != ''"> and additional_info = #{additionalInfo}</if>
+            <if test="tenantId != null "> and tenant_id = #{tenantId}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysFolderById" parameterType="Long" resultMap="SysFolderResult">
+        <include refid="selectSysFolderVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysFolder" parameterType="SysFolder">
+        insert into sys_folder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="assetId != null">asset_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="additionalInfo != null">additional_info,</if>
+            <if test="tenantId != null">tenant_id,</if>
+            <if test="type != null">type,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="assetId != null">#{assetId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="additionalInfo != null">#{additionalInfo},</if>
+            <if test="tenantId != null">#{tenantId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysFolder" parameterType="SysFolder">
+        update sys_folder
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="assetId != null">asset_id = #{assetId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="additionalInfo != null">additional_info = #{additionalInfo},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysFolderById" parameterType="Long">
+        delete from sys_folder where id = #{id}
+    </delete>
+
+    <delete id="deleteSysFolderByIds" parameterType="String">
+        delete from sys_folder where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

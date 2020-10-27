@@ -8,16 +8,13 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -920,4 +917,111 @@ public class ExcelUtil<T>
         }
         return val;
     }
+    /**
+     * 将excel表单数据源的数据导入到list
+     *
+     * @param sheetName
+     *            工作表的名称
+     * @param input
+     *            java输入流
+     */
+    public List<T> getExcelToList(String sheetName, InputStream input) throws Exception {
+        List<T> list = new ArrayList<T>();
+        try {
+            HSSFWorkbook book = new HSSFWorkbook(input);
+            HSSFSheet sheet = null;
+            // 如果指定sheet名,则取指定sheet中的内容.
+            if (StringUtils.isNotBlank(sheetName)) {
+                sheet = book.getSheet(sheetName);
+            }
+            // 如果传入的sheet名不存在则默认指向第1个sheet.
+            if (sheet == null) {
+                sheet = book.getSheetAt(0);
+            }
+            // 得到数据的行数
+            int rows = sheet.getPhysicalNumberOfRows();
+
+            // 有数据时才处理
+            if (rows > 0) {
+                // 得到类的所有field
+                Field[] allFields = clazz.getDeclaredFields();
+                // 定义一个map用于存放列的序号和field
+                Map<Integer, Field> fieldsMap = new HashMap<Integer, Field>();
+                for (int i = 0, index = 0; i < allFields.length; i++) {
+                    Field field = allFields[i];
+                    // 将有注解的field存放到map中
+                    if (field.isAnnotationPresent(Excel.class)) {
+                        // 设置类的私有字段属性可访问
+                        field.setAccessible(true);
+                        fieldsMap.put(index, field);
+                        index++;
+                    }
+                }
+                // 从第2行开始取数据,默认第一行是表头
+                for (int i = 1, len = rows; i < len; i++) {
+                    // 得到一行中的所有单元格对象.
+                    HSSFRow row = sheet.getRow(i);
+                    Iterator<Cell> cells = row.cellIterator();
+                    T entity = null;
+                    int index = 0;
+                    while (cells.hasNext()) {
+                        // 单元格中的内容.
+                        String c = cells.next().getStringCellValue();
+                        //空单元格  如果为空则continue的话,读到空单元格会把空单元格后面的数据		写入到当前单元格所映射的对象,所以为空的话,不做判断,后面会直接把空插入到对象
+//	                        if (!StringUtils.isNotBlank(c)) {
+//	                            continue;
+//	                        }
+
+                        if (c.indexOf("合计：") != -1) {
+                            continue;
+                        }
+                        // 如果不存在实例则新建
+                        entity = (entity == null ? clazz.newInstance() : entity);
+                        // 从map中得到对应列的field
+                        Field field = fieldsMap.get(index);
+                        if (field == null) {
+                            continue;
+                        }
+                        // 取得类型,并根据对象类型设置值.
+                        Class<?> fieldType = field.getType();
+                        SimpleDateFormat sdf = new SimpleDateFormat();
+                        //对空单元格的处理
+                        if (String.class == fieldType) {
+                            field.set(entity, String.valueOf(c));
+                        }else if ((Integer.TYPE == fieldType)
+                                || (Integer.class == fieldType)) {
+                            field.set(entity, Integer.parseInt(c));
+                        } else if ((Long.TYPE == fieldType)
+                                || (Long.class == fieldType)) {
+                            field.set(entity, Long.valueOf(c));
+                        } else if ((Float.TYPE == fieldType)
+                                || (Float.class == fieldType)) {
+                            field.set(entity, Float.valueOf(c));
+                        } else if ((Short.TYPE == fieldType)
+                                || (Short.class == fieldType)) {
+                            field.set(entity, Short.valueOf(c));
+                        } else if ((Double.TYPE == fieldType)
+                                || (Double.class == fieldType)) {
+                            field.set(entity, Double.valueOf(c));
+                        } else if (Character.TYPE == fieldType) {
+                            if ((c != null) && (c.length() > 0)) {
+                                field.set(entity, Character.valueOf(c.charAt(0)));
+                            }
+                        }else{
+                            field.set(entity, String.valueOf(c));
+                        }
+                        index++;
+
+                    }
+                    if (entity != null) {
+                        list.add(entity);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception("将excel表单数据源的数据导入到list异常!", e);
+        }
+        return list;
+    }
+
 }

@@ -76,6 +76,18 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+  #influxdb配置
+  influx:
+    url: http://127.0.0.1:8086
+    database: firstdb
+    user: admin
+    password: admin
+  #hadoop配置
+hadoop:
+  name-node: hdfs://192.168.50.89:9000
+  namespace: /tmp
+  username: dengsihao
+  password: 123456
 
 # token配置
 token:
@@ -117,3 +129,5 @@ xss:
   excludes: /system/notice/*
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
+
+
