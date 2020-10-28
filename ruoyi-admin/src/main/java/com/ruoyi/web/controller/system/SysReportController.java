@@ -227,4 +227,20 @@ public class SysReportController extends BaseController
         }
     }
 
+    /**
+    * 读取Hadoop中文件内容
+    * */
+    @PreAuthorize("@ss.hasAnyPermi('system:report:preview')")
+    @Log(title = "文档预览",businessType = BusinessType.OTHER)
+    @RequestMapping("/preview")
+    public AjaxResult readFile(@RequestParam("path") String path){
+        try {
+            StringBuffer stringBuffer = hadoopUtils.readFile(path);
+            return AjaxResult.success(stringBuffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResult.error("操作失败");
+        }
+    }
+
 }

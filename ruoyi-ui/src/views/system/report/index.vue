@@ -305,7 +305,7 @@
             <el-button  size="mini"
                         type="text"
                         icon="el-icon-share"
-                        @click="handleDetail(scope.row)"
+                        @click="handlePreview(scope.row)"
                         v-hasPermi="['system:report:detail']"
             >预览</el-button>
           </template>
@@ -400,6 +400,12 @@ export default {
   },
   methods: {
 
+    //hdfs:192.168.10.266:5000/a/b.txt
+    /** 文件预览 */
+    handlePreview(row){
+    var url = row.filePath;
+      window.open('http://127.0.0.1:8012/onlinePreview?url='+encodeURIComponent(url));
+    },
     /** 下载hadoop中存储的文件 */
     downloadFile(row){
       const data = new FormData();
