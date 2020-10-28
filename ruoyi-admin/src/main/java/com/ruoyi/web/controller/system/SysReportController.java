@@ -73,18 +73,7 @@ public class SysReportController extends BaseController
         return getDataTable(list);
     }
 
-    /**
-     * 导出文档存储列表
-     */
-    @PreAuthorize("@ss.hasPermi('system:report:export')")
-    @Log(title = "文档存储", businessType = BusinessType.EXPORT)
-    @GetMapping("/export")
-    public AjaxResult export(SysReport sysReport)
-    {
-        List<SysReport> list = sysReportService.selectSysReportList(sysReport);
-        ExcelUtil<SysReport> util = new ExcelUtil<SysReport>(SysReport.class);
-        return util.exportExcel(list, "report");
-    }
+
 
     /**
      * 获取文档存储详细信息
@@ -176,6 +165,18 @@ public class SysReportController extends BaseController
         }
     }
 
+    /**
+     * 导出文档存储列表
+     */
+    @PreAuthorize("@ss.hasPermi('system:report:export')")
+    @Log(title = "文档存储", businessType = BusinessType.EXPORT)
+    @GetMapping("/export")
+    public AjaxResult export(SysReport sysReport)
+    {
+        List<SysReport> list = sysReportService.selectSysReportList(sysReport);
+        ExcelUtil<SysReport> util = new ExcelUtil<SysReport>(SysReport.class);
+        return util.exportExcel(list, "report");
+    }
     /**
      * 文档存储下发
      * */
