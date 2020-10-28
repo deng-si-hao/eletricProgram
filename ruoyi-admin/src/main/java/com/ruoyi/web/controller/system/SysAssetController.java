@@ -43,6 +43,10 @@ public class SysAssetController extends BaseController
     @Autowired
     private ISysAssetService sysAssetService;
 
+
+
+
+    
     @Resource
     private HadoopUtils hadoopUtils;
 
