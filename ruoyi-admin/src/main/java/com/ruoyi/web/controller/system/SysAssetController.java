@@ -43,10 +43,6 @@ public class SysAssetController extends BaseController
     @Autowired
     private ISysAssetService sysAssetService;
 
-
-
-
-    
     @Resource
     private HadoopUtils hadoopUtils;
 
@@ -155,6 +151,28 @@ public class SysAssetController extends BaseController
         sysAsset.setTenantId(unitId);
         return toAjax(sysAssetService.updateSysAsset(sysAsset));
     }
+
+//    /**
+//    * 导入excl文件
+//    *
+//    * */
+//    @PreAuthorize("@ss.hasAnyPermi('system:asset:import')")
+//    @Log(title = "车辆信息",businessType = BusinessType.IMPORT)
+//    @PostMapping("/importData")
+//    public AjaxResult importData(@RequestParam("file") MultipartFile file){
+//        try {
+//            InputStream fis = file.getInputStream();
+//            ExcelUtil<SysAsset> util1 = new ExcelUtil<SysAsset>(SysAsset.class);
+//            List<SysAsset> assets = util1.getExcelToList("导入模板", fis);
+//            System.out.println("*****************"+assets.size());
+//            sysAssetService.addMysqlList(assets);
+//            System.out.println("----执行完毕----");
+//            return AjaxResult.success("导入数据成功");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return AjaxResult.error("导入数据失败");
+//        }
+//    }
 
     @GetMapping("/importTemplate")
     public AjaxResult importTemplate()

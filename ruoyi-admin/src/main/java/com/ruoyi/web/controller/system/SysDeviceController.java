@@ -184,7 +184,7 @@ public class SysDeviceController extends BaseController
                     .consistency(InfluxDB.ConsistencyLevel.ALL)
                     .build();
             for(int i=0;i<3;i++){
-                Point.Builder builder = Point.measurement(assetId.toString());
+                Point.Builder builder = Point.measurement(tablename);
                 String [] content = result.get(i);
                 if(i<=1){
                     title=result.get(0);

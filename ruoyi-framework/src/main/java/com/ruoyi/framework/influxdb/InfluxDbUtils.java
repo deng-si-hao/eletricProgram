@@ -290,4 +290,33 @@ public class InfluxDbUtils {
         query.append(limit);
         return this.fetchResults(query.toString(), clasz);
     }
+
+    public List<Object> getByKeys(String[] keys, String measurement){
+        String param = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(" select ");
+        if(keys != null){
+            for(int i=0;i<keys.length;i++){
+                if (keys.length<=1){
+                    //key::field
+                    param="\""+keys[0]+"\"::field";
+                    stringBuilder.append(param);
+                    break;
+                }
+                param = "\""+keys[i]+"\"::field,";
+                if(i==keys.length-1){
+                    param=param.substring(0,param.length()-1);
+                }
+                stringBuilder.append(param);
+            }
+        }else {
+            stringBuilder.append(" * ");
+        }
+        stringBuilder.append(" from ").append(measurement);
+
+        stringBuilder.append(" order by time asc");
+        System.out.println(stringBuilder.toString());
+        List<Object> result = this.fetchRecords(stringBuilder.toString());
+        return result;
+    }
 }
