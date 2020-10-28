@@ -1,9 +1,7 @@
 package com.ruoyi.web.controller.system;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -169,34 +167,5 @@ public class SysPictureController extends BaseController
         }
         sysPicture.setUnit(sysAsset.getUnit());
         return toAjax(sysPictureService.updateSysPicture(sysPicture));
-    }
-
-    /**
-    * 图片预览
-    * */
-    @PreAuthorize("@ss.hasAnyPermi('system:picture:preview')")
-    @Log(title = "图片预览",businessType = BusinessType.OTHER)
-    @PostMapping("/preview")
-    public AjaxResult readPic(@RequestParam("assetId")Long assetId,@RequestParam("path") String path){
-        List<Map<String,String>> res = new ArrayList<>();
-        StringBuffer[] buffers = new StringBuffer[20];
-        List<String> filenameList = new ArrayList<>();
-        String filepath = String.format("/%s/%s",assetId,path);
-        try {
-            res = hadoopUtils.listFile(filepath);
-            for(Map<String,String> maps:res){
-                filenameList.add(maps.get("filePath"));
-            }
-            if(filenameList.size()>0){
-                for(int i=0;i<filenameList.size();i++){
-                    buffers[i] = new StringBuffer();
-                    buffers[i].append(hadoopUtils.readFile(filenameList.get(i)));
-                }
-            }
-            return AjaxResult.success(buffers);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return toAjax(0);
     }
 }
