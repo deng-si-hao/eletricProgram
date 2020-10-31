@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DagComputeCaseEdgesMapper">
+    
+    <resultMap type="DagComputeCaseEdges" id="DagComputeCaseEdgesResult">
+        <result property="id"    column="id"    />
+        <result property="computeCaseId"    column="compute_case_id"    />
+        <result property="dstInputIdx"    column="dst_input_idx"    />
+        <result property="dstNodeId"    column="dst_node_id"    />
+        <result property="srcNodeId"    column="src_node_id"    />
+        <result property="srcOutputIdx"    column="src_output_idx"    />
+        <result property="edgestext"    column="edgesText"    />
+    </resultMap>
+
+    <sql id="selectDagComputeCaseEdgesVo">
+        select id, compute_case_id, dst_input_idx, dst_node_id, src_node_id, src_output_idx, edgesText from dag_compute_case_edges
+    </sql>
+
+    <select id="selectDagComputeCaseEdgesList" parameterType="DagComputeCaseEdges" resultMap="DagComputeCaseEdgesResult">
+        <include refid="selectDagComputeCaseEdgesVo"/>
+        <where>  
+            <if test="computeCaseId != null "> and compute_case_id = #{computeCaseId}</if>
+            <if test="dstInputIdx != null "> and dst_input_idx = #{dstInputIdx}</if>
+            <if test="dstNodeId != null "> and dst_node_id = #{dstNodeId}</if>
+            <if test="srcNodeId != null "> and src_node_id = #{srcNodeId}</if>
+            <if test="srcOutputIdx != null "> and src_output_idx = #{srcOutputIdx}</if>
+            <if test="edgestext != null  and edgestext != ''"> and edgesText = #{edgestext}</if>
+        </where>
+    </select>
+    
+    <select id="selectDagComputeCaseEdgesById" parameterType="Long" resultMap="DagComputeCaseEdgesResult">
+        <include refid="selectDagComputeCaseEdgesVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDagComputeCaseEdges" parameterType="DagComputeCaseEdges" useGeneratedKeys="true" keyProperty="id">
+        insert into dag_compute_case_edges
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="computeCaseId != null">compute_case_id,</if>
+            <if test="dstInputIdx != null">dst_input_idx,</if>
+            <if test="dstNodeId != null">dst_node_id,</if>
+            <if test="srcNodeId != null">src_node_id,</if>
+            <if test="srcOutputIdx != null">src_output_idx,</if>
+            <if test="edgestext != null">edgesText,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="computeCaseId != null">#{computeCaseId},</if>
+            <if test="dstInputIdx != null">#{dstInputIdx},</if>
+            <if test="dstNodeId != null">#{dstNodeId},</if>
+            <if test="srcNodeId != null">#{srcNodeId},</if>
+            <if test="srcOutputIdx != null">#{srcOutputIdx},</if>
+            <if test="edgestext != null">#{edgestext},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDagComputeCaseEdges" parameterType="DagComputeCaseEdges">
+        update dag_compute_case_edges
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="computeCaseId != null">compute_case_id = #{computeCaseId},</if>
+            <if test="dstInputIdx != null">dst_input_idx = #{dstInputIdx},</if>
+            <if test="dstNodeId != null">dst_node_id = #{dstNodeId},</if>
+            <if test="srcNodeId != null">src_node_id = #{srcNodeId},</if>
+            <if test="srcOutputIdx != null">src_output_idx = #{srcOutputIdx},</if>
+            <if test="edgestext != null">edgesText = #{edgestext},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDagComputeCaseEdgesById" parameterType="Long">
+        delete from dag_compute_case_edges where id = #{id}
+    </delete>
+
+    <delete id="deleteDagComputeCaseEdgesByIds" parameterType="String">
+        delete from dag_compute_case_edges where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DagComputeCasesMapper">
+    
+    <resultMap type="DagComputeCases" id="DagComputeCasesResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="description"    column="description"    />
+    </resultMap>
+
+    <sql id="selectDagComputeCasesVo">
+        select id, name, description from dag_compute_cases
+    </sql>
+
+    <select id="selectDagComputeCasesList" parameterType="DagComputeCases" resultMap="DagComputeCasesResult">
+        <include refid="selectDagComputeCasesVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+        </where>
+    </select>
+    
+    <select id="selectDagComputeCasesById" parameterType="Long" resultMap="DagComputeCasesResult">
+        <include refid="selectDagComputeCasesVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDagComputeCases" parameterType="DagComputeCases" useGeneratedKeys="true" keyProperty="id">
+        insert into dag_compute_cases
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="description != null">description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="description != null">#{description},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDagComputeCases" parameterType="DagComputeCases">
+        update dag_compute_cases
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDagComputeCasesById" parameterType="Long">
+        delete from dag_compute_cases where id = #{id}
+    </delete>
+
+    <delete id="deleteDagComputeCasesByIds" parameterType="String">
+        delete from dag_compute_cases where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

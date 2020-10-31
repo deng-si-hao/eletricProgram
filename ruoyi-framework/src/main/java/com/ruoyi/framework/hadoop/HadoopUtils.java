@@ -7,7 +7,6 @@ import org.apache.hadoop.io.IOUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -146,37 +145,6 @@ public class HadoopUtils {
             inputStream.close();
             fs.close();
         }
-    }
-
-    /**
-    * 读取图片为base64码
-    *
-    * */
-
-    public String readPicture(String filePath) throws Exception {
-        String res = null;
-        if (StringUtils.isEmpty(filePath)) {
-            return null;
-        }
-        if (!existFile(filePath)) {
-            return null;
-        }
-        FileSystem fs = getFileSystem();
-        // 目标路径
-        Path srcPath = new Path(filePath);
-        FSDataInputStream inputStream = null;
-        byte[] data = null;
-        try {
-            inputStream = fs.open(srcPath);
-            data = new byte[inputStream.available()];
-            inputStream.read(data);
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        BASE64Encoder encoder = new BASE64Encoder();
-        res = "data:image/jpg;base64," + encoder.encode(data);
-        return res;
     }
 
 

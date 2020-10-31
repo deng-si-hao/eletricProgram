@@ -1,14 +1,10 @@
 package com.ruoyi.web.controller.system;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
-import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.framework.hadoop.HadoopUtils;
@@ -30,11 +26,10 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * 图片存储Controller
- *
+ * 
  * @author d
  * @date 2020-10-13
  */
@@ -50,9 +45,6 @@ public class SysPictureController extends BaseController
 
     @Resource
     private HadoopUtils hadoopUtils;
-
-    @Autowired
-    private RedisCache redisCache;
 
     /**
      * 查询图片存储列表
@@ -175,38 +167,5 @@ public class SysPictureController extends BaseController
         }
         sysPicture.setUnit(sysAsset.getUnit());
         return toAjax(sysPictureService.updateSysPicture(sysPicture));
-    }
-    /**
-     * 图片预览
-     * */
-    @PreAuthorize("@ss.hasAnyPermi('system:picture:preview')")
-//    @Log(title = "图片预览",businessType = BusinessType.OTHER)
-    @PostMapping("/preview")
-    public AjaxResult readPic(@RequestParam("assetId")Long assetId, @RequestParam("path") String path, HttpServletResponse response){
-        List<Map<String,String>> res = new ArrayList<>();
-        List<String> filePathList = new ArrayList<>();
-        List<String> imgList = new ArrayList<>();
-        String filepath = String.format("/%s/%s",assetId,path);
-        imgList = redisCache.getCacheList(filepath);
-        if(imgList.size()>0){
-            redisCache.expire(filepath,3600);
-            return AjaxResult.success(imgList);
-        }
-        try {
-            res = hadoopUtils.listFile(filepath);
-            for(Map<String,String> maps:res){
-                filePathList.add(maps.get("filePath"));
-            }
-            if(filePathList.size()>0){
-                for(String filePath:filePathList){
-                    imgList.add(hadoopUtils.readPicture(filePath));
-                }
-                redisCache.setCacheList(filepath,imgList);
-            }
-            return AjaxResult.success(imgList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return AjaxResult.error("失败");
-        }
     }
 }

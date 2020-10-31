@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DagNodeAlgorithmMapMapper">
+    
+    <resultMap type="DagNodeAlgorithmMap" id="DagNodeAlgorithmMapResult">
+        <result property="id"    column="id"    />
+        <result property="nodeAlgorithmId"    column="node_algorithm_id"    />
+        <result property="algorithmName"    column="algorithm_name"    />
+        <result property="description"    column="description"    />
+    </resultMap>
+
+    <sql id="selectDagNodeAlgorithmMapVo">
+        select id, node_algorithm_id, algorithm_name, description from dag_node_algorithm_map
+    </sql>
+
+    <select id="selectDagNodeAlgorithmMapList" parameterType="DagNodeAlgorithmMap" resultMap="DagNodeAlgorithmMapResult">
+        <include refid="selectDagNodeAlgorithmMapVo"/>
+        <where>  
+            <if test="nodeAlgorithmId != null "> and node_algorithm_id = #{nodeAlgorithmId}</if>
+            <if test="algorithmName != null  and algorithmName != ''"> and algorithm_name like concat('%', #{algorithmName}, '%')</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+        </where>
+    </select>
+    
+    <select id="selectDagNodeAlgorithmMapById" parameterType="Long" resultMap="DagNodeAlgorithmMapResult">
+        <include refid="selectDagNodeAlgorithmMapVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDagNodeAlgorithmMap" parameterType="DagNodeAlgorithmMap" useGeneratedKeys="true" keyProperty="id">
+        insert into dag_node_algorithm_map
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nodeAlgorithmId != null">node_algorithm_id,</if>
+            <if test="algorithmName != null">algorithm_name,</if>
+            <if test="description != null">description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nodeAlgorithmId != null">#{nodeAlgorithmId},</if>
+            <if test="algorithmName != null">#{algorithmName},</if>
+            <if test="description != null">#{description},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDagNodeAlgorithmMap" parameterType="DagNodeAlgorithmMap">
+        update dag_node_algorithm_map
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nodeAlgorithmId != null">node_algorithm_id = #{nodeAlgorithmId},</if>
+            <if test="algorithmName != null">algorithm_name = #{algorithmName},</if>
+            <if test="description != null">description = #{description},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDagNodeAlgorithmMapById" parameterType="Long">
+        delete from dag_node_algorithm_map where id = #{id}
+    </delete>
+
+    <delete id="deleteDagNodeAlgorithmMapByIds" parameterType="String">
+        delete from dag_node_algorithm_map where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
