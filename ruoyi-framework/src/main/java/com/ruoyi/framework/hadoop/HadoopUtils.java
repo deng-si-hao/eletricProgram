@@ -293,7 +293,33 @@ public class HadoopUtils {
         return true;
     }
 
+    public InputStream readFileToStream(String path) throws Exception {
+        if (StringUtils.isEmpty(path)) {
+            return null;
+        }
+        if (!existFile(path)) {
+            return null;
+        }
+        FileSystem fs = getFileSystem();
+        // 目标路径
+        Path srcPath = new Path(path);
+        FSDataInputStream inputStream = null;
 
+            inputStream = fs.open(srcPath);
+            // 防止中文乱码
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+//            String lineTxt = "";
+//            StringBuffer sb = new StringBuffer();
+//            while ((lineTxt = reader.readLine()) != null) {
+//                sb.append(lineTxt);
+//            }
+            return inputStream;
+
+//        } finally {
+//            inputStream.close();
+//            fs.close();
+//        }
+    }
 
 
 }

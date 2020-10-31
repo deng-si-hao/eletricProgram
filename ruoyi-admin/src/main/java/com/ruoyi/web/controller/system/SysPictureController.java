@@ -1,16 +1,22 @@
 package com.ruoyi.web.controller.system;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.common.utils.uuid.IdUtils;
 import com.ruoyi.framework.hadoop.HadoopUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.domain.SysAsset;
@@ -30,6 +36,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -209,4 +216,68 @@ public class SysPictureController extends BaseController
             return AjaxResult.error("失败");
         }
     }
+
+    /**
+     * 批量下载文件
+     * */
+    @PreAuthorize("@ss.hasAnyPermi('system:picture:download')")
+//    @Log(title = "图片预览",businessType = BusinessType.OTHER)
+    @PostMapping("/downloadFile")
+    public void downloadFiles(@RequestParam("assetId") String assetId,@RequestParam("path") String filePath, HttpServletRequest request, HttpServletResponse response){
+        //响应头的设置
+        response.reset();
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("multipart/form-data");
+        //设置压缩包的名字
+        String dates = String.valueOf(IdUtils.getNewId());
+        String billname = "附件包-"+dates;
+        String downloadName = billname+".zip";
+        //返回客户端浏览器的版本号、类型
+        String agent = request.getHeader("USER-AGENT");
+        try {
+            //针对IE或者以IE为内核的浏览器：
+            if (agent.contains("MSIE")||agent.contains("Trident")) {
+                downloadName = java.net.URLEncoder.encode(downloadName, "UTF-8");
+            } else {
+                //非IE浏览器的处理：
+                downloadName = new String(downloadName.getBytes("UTF-8"),"ISO-8859-1");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        response.setHeader("Content-Disposition", "attachment;fileName=\"" + downloadName + "\"");
+        //设置压缩流：直接写入response，实现边压缩边下载
+        ZipOutputStream zipos = null;
+        try {
+            zipos = new ZipOutputStream(new BufferedOutputStream(response.getOutputStream()));
+            zipos.setMethod(ZipOutputStream.DEFLATED); //设置压缩方法
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //循环将文件写入压缩流
+        DataOutputStream os = null;
+        String path = String.format("/%s/%s",assetId,filePath);
+        try {
+            List<Map<String,String>> files = hadoopUtils.listFile(path);
+            for(Map<String,String> map:files){
+                String filename = map.get("fileName");
+                zipos.putNextEntry(new ZipEntry(filename));
+                os = new DataOutputStream(zipos);
+                InputStream is = hadoopUtils.readFileToStream(map.get("filePath"));
+                byte[] b = new byte[100];
+                int length = 0;
+                while((length = is.read(b))!= -1){
+                    os.write(b, 0, length);
+                }
+                os.flush();
+                is.close();
+                zipos.flush();
+                zipos.closeEntry();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
